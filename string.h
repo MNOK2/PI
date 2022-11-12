@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <string.h>
 
-#define STRING_LENGTH_MAX 1024
+#define STRING_LENGTH_MAX (1 << 14)
 
 typedef struct _String {
     char value[STRING_LENGTH_MAX];
