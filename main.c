@@ -9,7 +9,7 @@ int main() {
     initialize();
     
     Number a = numberRandom(3);
-    Number b = numberRandom(3);
+    Number b = numberRandom(2);
 
     printf("a = %s\n", numberToString(a).value);
     printf("b = %s\n", numberToString(b).value);
