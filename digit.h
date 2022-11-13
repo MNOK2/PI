@@ -8,10 +8,8 @@ typedef struct _Digit {
 } Digit;
 
 Digit newDigit(char value);
-Digit digitAdd(Digit a, Digit b);
-Digit digitSub(Digit a, Digit b);
-char digitAddCarry(Digit a, Digit b);
-char digitSubCarry(Digit a, Digit b);
+Digit digitAdd(Digit a, Digit b, int *carry);
+Digit digitSub(Digit a, Digit b, int *carry);
 char digitEquals(Digit a, Digit b);
 char digitIsLess(Digit a, Digit b);
 char digitIsGreater(Digit a, Digit b);
@@ -26,12 +24,16 @@ Digit newDigit(char value) {
     return result;
 }
 
-Digit digitAdd(Digit a, Digit b) {
-    return newDigit((a._value + b._value) % 10);
+Digit digitAdd(Digit a, Digit b, int *carry) {
+    int sum = a._value + b._value + *carry;
+    *carry = sum / 10 - (sum < 0 ? 1 : 0);
+    return newDigit(sum % 10 + (sum < 0 ? 10 : 0));
 }
 
-Digit digitSub(Digit a, Digit b) {
-    return newDigit(((a._value - b._value) < 0 ? (a._value - b._value + 10) : (a._value - b._value)) % 10);
+Digit digitSub(Digit a, Digit b, int *carry) {
+    int diff = a._value - b._value + *carry;
+    *carry = diff / 10 - (diff < 0 ? 1 : 0);
+    return newDigit(diff % 10 + (diff < 0 ? 10 : 0));
 }
 
 char digitAddCarry(Digit a, Digit b) {

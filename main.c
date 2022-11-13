@@ -8,13 +8,7 @@ void initialize();
 int main() {
     initialize();
     
-    Number a = numberRandom(3);
-    Number b = numberRandom(3);
-
-    printf("a = %s\n", numberToString(a).value);
-    printf("b = %s\n", numberToString(b).value);
-    printf("a + b = %s\n", numberToString(numberAdd(a, b)).value);
-    printf("a - b = %s\n", numberToString(numberSub(a, b)).value);
+    for (int i = -1; i <= 1; i++) for (int j = -1; j <= 1; j++) printf("(%s) + (%s) = (%s)\n", numberToString(intToNumber(i)).value, numberToString(intToNumber(j)).value, numberToString(numberAdd(intToNumber(i), intToNumber(j))).value);
 
     return 0;
 }

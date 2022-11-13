@@ -80,11 +80,8 @@ Number numberAdd(Number a, Number b) {
     if (signEquals(a._sign, signNegative())) return numberSignReversed(numberAdd(numberSignReversed(a), numberSignReversed(b)));
 
     Digit digits[NUMBER_DIGITS_COUNT_MAX];
-    char carry = 0;
-    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) {
-        digits[i] = digitAdd(digitAdd(a._digits[i], b._digits[i]), newDigit(carry));
-        carry = digitAddCarry(a._digits[i], b._digits[i]) + digitAddCarry(digitAdd(a._digits[i], b._digits[i]), newDigit(carry));
-    }
+    int carry = 0;
+    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = digitAdd(a._digits[i], b._digits[i], &carry);
     return newNumber(signPositive(), digits);
 }
 
@@ -95,11 +92,8 @@ Number numberSub(Number a, Number b) {
     if (numberIsLess(a, b)) return numberSignReversed(numberSub(b, a));
 
     Digit digits[NUMBER_DIGITS_COUNT_MAX];
-    char carry = 0;
-    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) {
-        digits[i] = digitSub(digitSub(a._digits[i], b._digits[i]), newDigit(-carry));
-        carry = digitSubCarry(a._digits[i], b._digits[i]) + digitSubCarry(digitAdd(a._digits[i], b._digits[i]), newDigit(-carry));
-    }
+    int carry = 0;
+    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = digitSub(a._digits[i], b._digits[i], &carry);
     return newNumber(signPositive(), digits);
 }
 
