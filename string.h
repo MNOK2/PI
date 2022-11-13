@@ -13,7 +13,6 @@ typedef struct _String {
 
 String stringPrintf(const char *str, ...);
 char stringEquals(String a, String b);
-char *stringToCharP(String string);
 
 String stringPrintf(const char *str, ...) {
     String result;
