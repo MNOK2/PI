@@ -36,14 +36,6 @@ Digit digitSub(Digit a, Digit b, int *carry) {
     return newDigit(diff % 10 + (diff < 0 ? 10 : 0));
 }
 
-char digitAddCarry(Digit a, Digit b) {
-    return (a._value + b._value) / 10;
-}
-
-char digitSubCarry(Digit a, Digit b) {
-    return ((a._value - b._value) < 0 ? (a._value - b._value - 10) : (a._value - b._value)) / 10;
-}
-
 char digitEquals(Digit a, Digit b) {
     return a._value == b._value;
 }
