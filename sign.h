@@ -1,25 +1,25 @@
 #ifndef _H_SIGN_
 #define _H_SIGN_
 
-#include "string.h"
+#include <string.h>
 
 typedef struct _Sign {
-    String _value;
+    char *_value;
 } Sign;
 
 Sign signPositive();
 Sign signNegative();
 Sign signReversed(Sign sign);
 char signEquals(Sign a, Sign b);
-String signToString(Sign sign);
+char *signToCharP(Sign sign);
 
 Sign signPositive() {
-    Sign result = { ._value = stringPrintf("+ ") };
+    Sign result = { ._value = "+ " };
     return result;
 }
 
 Sign signNegative() {
-    Sign result = { ._value = stringPrintf("- ") };
+    Sign result = { ._value = "- " };
     return result;
 }
 
@@ -28,10 +28,10 @@ Sign signReversed(Sign sign) {
 }
 
 char signEquals(Sign a, Sign b) {
-    return stringEquals(a._value, b._value);
+    return !strcmp(a._value, b._value);
 }
 
-String signToString(Sign sign) {
+char *signToCharP(Sign sign) {
     return sign._value;
 }
 

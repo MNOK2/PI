@@ -3,9 +3,10 @@
 
 #include "sign.h"
 #include "digit.h"
+#include "string.h"
 #include "system.h"
 
-#define NUMBER_DIGITS_COUNT_MAX 16
+#define NUMBER_DIGITS_COUNT_MAX (1 << 6)
 
 typedef struct _Number {
     Sign _sign;
@@ -160,7 +161,7 @@ String numberToString(Number number) {
     String result;
     char zeroOngoing = 1;
 
-    result = signToString(number._sign);
+    result = stringPrintf(signToCharP(number._sign));
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) {
         if (!digitEquals(number._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i], newDigit(0))) zeroOngoing = 0;
         if (!zeroOngoing) result = stringPrintf("%s%d%s", result.value, digitToChar(number._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i]), i < NUMBER_DIGITS_COUNT_MAX - 1 ? " " : "");
