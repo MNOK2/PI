@@ -168,7 +168,7 @@ char numberIsLess(Number a, Number b) {
 
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) {
         if (digitIsLess(a._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i], b._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i])) return 1;
-        else if (digitIsGreater(a._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i], b._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i])) return 0;
+        if (digitIsGreater(a._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i], b._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i])) return 0;
     }
     return 0;
 }
