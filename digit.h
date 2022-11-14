@@ -4,7 +4,7 @@
 #include "system.h"
 
 typedef struct _Digit {
-    unsigned char _value;
+    char _value;
 } Digit;
 
 Digit newDigit(char value);

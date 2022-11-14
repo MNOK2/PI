@@ -105,9 +105,10 @@ char numberIsZero(Number number) {
 
 char numberEquals(Number a, Number b) {
     if (numberIsZero(a) && numberIsZero(b)) return 1;
+    if (!signEquals(a._sign, b._sign)) return 0;
 
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) if (!digitEquals(a._digits[i], b._digits[i])) return 0;
-    return signEquals(a._sign, b._sign);
+    return 1;
 }
 
 char numberIsLess(Number a, Number b) {
