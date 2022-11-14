@@ -26,6 +26,8 @@ Number numberMul(Number a, Number b);
 Number numberMulDigit(Number number, Digit digit);
 Number numberBeforeIncrement(Number *number);
 Number numberAfterIncrement(Number *number);
+Number numberBeforeDecrement(Number *number);
+Number numberAfterDecrement(Number *number);
 char numberIsZero(Number number);
 char numberEquals(Number a, Number b);
 char numberIsLess(Number a, Number b);
@@ -131,6 +133,17 @@ Number numberBeforeIncrement(Number *number) {
 
 Number numberAfterIncrement(Number *number) {
     *number = numberAdd(*number, intToNumber(1));
+    return *number;
+}
+
+Number numberBeforeDecrement(Number *number) {
+    Number result = *number;
+    *number = numberSub(*number, intToNumber(1));
+    return result;
+}
+
+Number numberAfterDecrement(Number *number) {
+    *number = numberSub(*number, intToNumber(1));
     return *number;
 }
 
