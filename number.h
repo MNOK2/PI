@@ -16,11 +16,16 @@ typedef struct _Number {
 Number newNumber(Sign sign, const Digit *digits);
 Number numberZero();
 Number numberRandom(int digitsCount);
+Number numberAbs(Number number);
 Number numberSignReversed(Number number);
 Number numberDigitShiftLeft(Number number, int count);
 Number numberDigitShiftRight(Number number, int count);
 Number numberAdd(Number a, Number b);
 Number numberSub(Number a, Number b);
+Number numberMul(Number a, Number b);
+Number numberMulDigit(Number number, Digit digit);
+Number numberBeforeIncrement(Number *number);
+Number numberAfterIncrement(Number *number);
 char numberIsZero(Number number);
 char numberEquals(Number a, Number b);
 char numberIsLess(Number a, Number b);
@@ -51,6 +56,10 @@ Number numberRandom(int digitsCount) {
     for (int i = 0; i < digitsCount; i++) digits[i] = newDigit(randomRangeInt(0, 10));
     for (int i = digitsCount; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = newDigit(0);
     return newNumber(probabilityIsHit(0.5f) ? signNegative() : signPositive(), digits);
+}
+
+Number numberAbs(Number number) {
+    return newNumber(signPositive(), number._digits);
 }
 
 Number numberSignReversed(Number number) {
@@ -96,6 +105,33 @@ Number numberSub(Number a, Number b) {
     int carry = 0;
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = digitSub(a._digits[i], b._digits[i], &carry);
     return newNumber(signPositive(), digits);
+}
+
+Number numberMul(Number a, Number b) {
+    if (!signEquals(a._sign, b._sign)) return numberSignReversed(numberMul(numberAbs(a), numberAbs(b)));
+    if (signEquals(a._sign, signNegative())) return numberMul(numberSignReversed(a), numberSignReversed(b));
+
+    Number result = numberZero();
+    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) result = numberAdd(result, numberDigitShiftLeft(numberMulDigit(a, b._digits[i]), i));
+    return result;
+}
+
+Number numberMulDigit(Number number, Digit digit) {
+    Digit digits[NUMBER_DIGITS_COUNT_MAX];
+    int carry = 0;
+    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = digitMul(number._digits[i], digit, &carry);
+    return newNumber(number._sign, digits);
+}
+
+Number numberBeforeIncrement(Number *number) {
+    Number result = *number;
+    *number = numberAdd(*number, intToNumber(1));
+    return result;
+}
+
+Number numberAfterIncrement(Number *number) {
+    *number = numberAdd(*number, intToNumber(1));
+    return *number;
 }
 
 char numberIsZero(Number number) {

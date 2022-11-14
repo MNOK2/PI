@@ -10,6 +10,7 @@ typedef struct _Digit {
 Digit newDigit(char value);
 Digit digitAdd(Digit a, Digit b, int *carry);
 Digit digitSub(Digit a, Digit b, int *carry);
+Digit digitMul(Digit a, Digit b, int *carry);
 char digitEquals(Digit a, Digit b);
 char digitIsLess(Digit a, Digit b);
 char digitIsGreater(Digit a, Digit b);
@@ -34,6 +35,12 @@ Digit digitSub(Digit a, Digit b, int *carry) {
     int diff = a._value - b._value + *carry;
     *carry = diff / 10 - (diff < 0 ? 1 : 0);
     return newDigit(diff % 10 + (diff < 0 ? 10 : 0));
+}
+
+Digit digitMul(Digit a, Digit b, int *carry) {
+    int pro = a._value * b._value + *carry;
+    *carry = pro / 10 - (pro < 0 ? 1 : 0);
+    return newDigit(pro % 10 + (pro < 0 ? 10 : 0));
 }
 
 char digitEquals(Digit a, Digit b) {
