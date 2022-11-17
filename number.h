@@ -24,6 +24,7 @@ Number numberAdd(Number a, Number b);
 Number numberSub(Number a, Number b);
 Number numberMul(Number a, Number b);
 Number numberDiv(Number a, Number b);
+Number numberMod(Number a, Number b);
 Number numberMulDigit(Number number, Digit digit);
 Digit numberDivDigit(Number a, Number b, Number *mod);
 Number numberBeforeIncrement(Number *number);
@@ -121,6 +122,7 @@ Number numberMul(Number a, Number b) {
 }
 
 Number numberDiv(Number a, Number b) {
+    if (numberIsZero(b)) return numberZero();
     if (!signEquals(a._sign, b._sign)) return numberSignReversed(numberDiv(numberAbs(a), numberAbs(b)));
     if (signEquals(a._sign, signNegative())) return numberDiv(numberSignReversed(a), numberSignReversed(b));
 
@@ -128,6 +130,10 @@ Number numberDiv(Number a, Number b) {
     Number mod = a;
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[NUMBER_DIGITS_COUNT_MAX - 1 - i] = numberDivDigit(mod, numberDigitShiftLeft(b, NUMBER_DIGITS_COUNT_MAX - 1 - i), &mod);
     return newNumber(signPositive(), digits);
+}
+
+Number numberMod(Number a, Number b) {
+    return numberSub(a, numberMul(b, numberDiv(a, b)));
 }
 
 Number numberMulDigit(Number number, Digit digit) {
@@ -140,13 +146,14 @@ Number numberMulDigit(Number number, Digit digit) {
 Digit numberDivDigit(Number a, Number b, Number *mod) {
     if (signEquals(a._sign, signNegative()) || signEquals(b._sign, signNegative())) throwExceptionIllegalArgument("numberDivDigit");
 
-    for (int i = 1; i <= 10; i++) {
-        if (i >= 10 || numberIsLess(a, numberMulDigit(b, newDigit(i)))) {
+    for (int i = 1; i < 10; i++) {
+        if (numberIsLess(a, numberMulDigit(b, newDigit(i)))) {
             *mod = numberSub(a, numberMulDigit(b, newDigit(i - 1)));
             return newDigit(i - 1);
         }
-    }    
-    return newDigit(0);
+    }
+    *mod = numberSub(a, numberMulDigit(b, newDigit(9)));
+    return newDigit(9);
 }
 
 Number numberBeforeIncrement(Number *number) {
