@@ -8,8 +8,8 @@ void initialize();
 int main() {
     initialize();
     
-    Number a = numberRandom(2);
-    Number b = numberRandom(1);
+    Number a = numberRandom(4);
+    Number b = numberRandom(3);
 
     printf("a = %s\n", numberToString(a).value);
     printf("b = %s\n", numberToString(b).value);

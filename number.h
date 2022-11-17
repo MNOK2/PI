@@ -6,7 +6,7 @@
 #include "string.h"
 #include "system.h"
 
-#define NUMBER_DIGITS_COUNT_MAX (1 << 6)
+#define NUMBER_DIGITS_COUNT_MAX (1 << 10)
 
 typedef struct _Number {
     Sign _sign;
@@ -20,6 +20,7 @@ Number numberAbs(Number number);
 Number numberSignReversed(Number number);
 Number numberDigitShiftLeft(Number number, int count);
 Number numberDigitShiftRight(Number number, int count);
+Number numberDigitInserted(Number number, Digit digit);
 Number numberAdd(Number a, Number b);
 Number numberSub(Number a, Number b);
 Number numberMul(Number a, Number b);
@@ -89,6 +90,12 @@ Number numberDigitShiftRight(Number number, int count) {
     return newNumber(number._sign, digits);
 }
 
+Number numberDigitInserted(Number number, Digit digit) {
+    Number result = numberDigitShiftLeft(number, 1);
+    result._digits[0] = digit;
+    return result;
+}
+
 Number numberAdd(Number a, Number b) {
     if (signEquals(a._sign, signNegative()) && signEquals(b._sign, signPositive())) return numberSub(b, numberSignReversed(a));
     if (signEquals(a._sign, signPositive()) && signEquals(b._sign, signNegative())) return numberSub(a, numberSignReversed(b));
@@ -127,8 +134,8 @@ Number numberDiv(Number a, Number b) {
     if (signEquals(a._sign, signNegative())) return numberDiv(numberSignReversed(a), numberSignReversed(b));
 
     Digit digits[NUMBER_DIGITS_COUNT_MAX];
-    Number mod = a;
-    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[NUMBER_DIGITS_COUNT_MAX - 1 - i] = numberDivDigit(mod, numberDigitShiftLeft(b, NUMBER_DIGITS_COUNT_MAX - 1 - i), &mod);
+    Number mod = numberZero();
+    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[NUMBER_DIGITS_COUNT_MAX - 1 - i] = numberDivDigit(numberDigitInserted(mod, a._digits[NUMBER_DIGITS_COUNT_MAX - 1 - i]), b, &mod);
     return newNumber(signPositive(), digits);
 }
 
@@ -137,6 +144,8 @@ Number numberMod(Number a, Number b) {
 }
 
 Number numberMulDigit(Number number, Digit digit) {
+    if (signEquals(number._sign, signNegative())) return numberSignReversed(numberMulDigit(numberSignReversed(number), digit));
+
     Digit digits[NUMBER_DIGITS_COUNT_MAX];
     int carry = 0;
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = digitMul(number._digits[i], digit, &carry);
@@ -145,12 +154,14 @@ Number numberMulDigit(Number number, Digit digit) {
 
 Digit numberDivDigit(Number a, Number b, Number *mod) {
     if (signEquals(a._sign, signNegative()) || signEquals(b._sign, signNegative())) throwExceptionIllegalArgument("numberDivDigit");
+    if (numberIsZero(b)) {
+        *mod = a;
+        return newDigit(0);
+    }
 
-    for (int i = 1; i < 10; i++) {
-        if (numberIsLess(a, numberMulDigit(b, newDigit(i)))) {
-            *mod = numberSub(a, numberMulDigit(b, newDigit(i - 1)));
-            return newDigit(i - 1);
-        }
+    for (int i = 1; i < 10; i++) if (numberIsLess(a, numberMulDigit(b, newDigit(i)))) {
+        *mod = numberSub(a, numberMulDigit(b, newDigit(i - 1)));
+        return newDigit(i - 1);
     }
     *mod = numberSub(a, numberMulDigit(b, newDigit(9)));
     return newDigit(9);
