@@ -23,7 +23,9 @@ Number numberDigitShiftRight(Number number, int count);
 Number numberAdd(Number a, Number b);
 Number numberSub(Number a, Number b);
 Number numberMul(Number a, Number b);
+Number numberDiv(Number a, Number b);
 Number numberMulDigit(Number number, Digit digit);
+Digit numberDivDigit(Number a, Number b, Number *mod);
 Number numberBeforeIncrement(Number *number);
 Number numberAfterIncrement(Number *number);
 Number numberBeforeDecrement(Number *number);
@@ -118,11 +120,33 @@ Number numberMul(Number a, Number b) {
     return result;
 }
 
+Number numberDiv(Number a, Number b) {
+    if (!signEquals(a._sign, b._sign)) return numberSignReversed(numberDiv(numberAbs(a), numberAbs(b)));
+    if (signEquals(a._sign, signNegative())) return numberDiv(numberSignReversed(a), numberSignReversed(b));
+
+    Digit digits[NUMBER_DIGITS_COUNT_MAX];
+    Number mod = a;
+    for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[NUMBER_DIGITS_COUNT_MAX - 1 - i] = numberDivDigit(mod, numberDigitShiftLeft(b, NUMBER_DIGITS_COUNT_MAX - 1 - i), &mod);
+    return newNumber(signPositive(), digits);
+}
+
 Number numberMulDigit(Number number, Digit digit) {
     Digit digits[NUMBER_DIGITS_COUNT_MAX];
     int carry = 0;
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) digits[i] = digitMul(number._digits[i], digit, &carry);
     return newNumber(number._sign, digits);
+}
+
+Digit numberDivDigit(Number a, Number b, Number *mod) {
+    if (signEquals(a._sign, signNegative()) || signEquals(b._sign, signNegative())) throwExceptionIllegalArgument("numberDivDigit");
+
+    for (int i = 1; i <= 10; i++) {
+        if (i >= 10 || numberIsLess(a, numberMulDigit(b, newDigit(i)))) {
+            *mod = numberSub(a, numberMulDigit(b, newDigit(i - 1)));
+            return newDigit(i - 1);
+        }
+    }    
+    return newDigit(0);
 }
 
 Number numberBeforeIncrement(Number *number) {
