@@ -37,6 +37,11 @@ bool tryNumberMul(const Number *, const Number *, Number *);
 bool tryNumberDiv(const Number *, const Number *, Number *);
 bool tryNumberMod(const Number *, const Number *, Number *);
 bool tryNumberDivMod(const Number *, const Number *, Number *, Number *);
+bool tryNumberAddAssign(Number *, const Number *);
+bool tryNumberSubAssign(Number *, const Number *);
+bool tryNumberMulAssign(Number *, const Number *);
+bool tryNumberDivAssign(Number *, const Number *);
+bool tryNumberModAssign(Number *, const Number *);
 bool tryNumberMulDigit(const Number *, Digit, Number *);
 bool tryNumberDivDigit(const Number *, const Number *, Digit *result, Number *mod);
 
@@ -233,14 +238,13 @@ bool tryNumberMul(const Number *a, const Number *b, Number *result) {
         return tryNumberMul(&aAbs, &bAbs, result);
     }
 
-    Number pro, sum, shifted;
+    Number pro, shifted;
     numberMakeZero(result);
     result->_sign = SIGN_POSITIVE;
     for (int i = 0; i < NUMBER_DIGITS_COUNT_MAX; i++) {
         if (!tryNumberMulDigit(a, b->_digits[i], &pro)) return false;
         numberDigitShiftLeft(&pro, i, &shifted);
-        if (!tryNumberAdd(result, &shifted, &sum)) return false;
-        *result = sum;
+        if (!tryNumberAddAssign(result, &shifted)) return false;
     }
     return true;
 }
@@ -256,6 +260,7 @@ bool tryNumberMod(const Number *a, const Number *b, Number *result) {
 }
 
 bool tryNumberDivMod(const Number *a, const Number *b, Number *result, Number *rem) {
+    if (numberIsZero(b)) return false;
     if (a->_sign != b->_sign) {
         Number aAbs, bAbs, div;
         numberAbs(a, &aAbs);
@@ -284,6 +289,41 @@ bool tryNumberDivMod(const Number *a, const Number *b, Number *result, Number *r
     return true;
 }
 
+bool tryNumberAddAssign(Number *dst, const Number *src) {
+    Number sum;
+    if (!tryNumberAdd(dst, src, &sum)) return false;
+    *dst = sum;
+    return true;
+}
+
+bool tryNumberSubAssign(Number *dst, const Number *src) {
+    Number diff;
+    if (!tryNumberSub(dst, src, &diff)) return false;
+    *dst = diff;
+    return true;
+}
+
+bool tryNumberMulAssign(Number *dst, const Number *src) {
+    Number pro;
+    if (!tryNumberMul(dst, src, &pro)) return false;
+    *dst = pro;
+    return true;
+}
+
+bool tryNumberDivAssign(Number *dst, const Number *src) {
+    Number quo;
+    if (!tryNumberDiv(dst, src, &quo)) return false;
+    *dst = quo;
+    return true;
+}
+
+bool tryNumberModAssign(Number *dst, const Number *src) {
+    Number rem;
+    if (!tryNumberMod(dst, src, &rem)) return false;
+    *dst = rem;
+    return true;
+}
+
 bool tryNumberMulDigit(const Number *number, Digit digit, Number *result) {
     int carry = 0;
     result->_sign = number->_sign;
@@ -295,7 +335,16 @@ bool tryNumberDivDigit(const Number *a, const Number *b, Digit *result, Number *
     Number pro;
     Digit digit;
     if (a->_sign != b->_sign) return false;
-    rem->_sign = a->_sign;
+    if (a->_sign == SIGN_NEGATIVE) {
+        Number aAbs, bAbs;
+        numberAbs(a, &aAbs);
+        numberAbs(b, &bAbs);
+        if (!tryNumberDivDigit(&aAbs, &bAbs, result, rem)) return false;
+        rem->_sign = SIGN_NEGATIVE;
+        return true;
+    }
+
+    rem->_sign = SIGN_POSITIVE;
     for (int i = 1; i < 10; i++) {
         if (!tryCharToDigit(i, &digit)) return false;
         if (!tryNumberMulDigit(b, digit, &pro)) return false;

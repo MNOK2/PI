@@ -22,6 +22,8 @@ int main() {
     printf("(int)a / (int)b = %d\n", numberToInt(a) / numberToInt(b));
     printf("(int)a %% (int)b = %d\n", numberToInt(a) % numberToInt(b));
 
+    for (int i = 0; i < 100; i++) numberDiv(numberRandom(64), numberRandom(32));
+
     return 0;
 }
 

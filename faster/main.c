@@ -22,16 +22,16 @@ int main() {
     putchar('\n');
 
     if (tryNumberAdd(&a, &b, &sum)) numberPrintWithName(&sum, "a + b");
-    else printf("加算に失敗しました（絶望）");
+    else printf("加算に失敗しました（絶望）\n");
     if (tryNumberSub(&a, &b, &diff)) numberPrintWithName(&diff, "a - b");
-    else printf("減算に失敗しました（絶望）");
+    else printf("減算に失敗しました（絶望）\n");
     if (tryNumberMul(&a, &b, &pro)) numberPrintWithName(&pro, "a * b");
-    else printf("乗算に失敗しました（絶望）");
+    else printf("乗算に失敗しました（絶望）\n");
     if (tryNumberDivMod(&a, &b, &quo, &rem)) {
         numberPrintWithName(&quo, "a / b");
-        numberPrintWithName(&rem, "a %% b");
+        numberPrintWithName(&rem, "a % b");
     }
-    else printf("除算に失敗しました（絶望）");
+    else printf("除算に失敗しました（絶望）\n");
 
     putchar('\n');
 
