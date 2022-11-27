@@ -1,33 +1,102 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "number.h"
+#include "multi_int.h"
 
-void initialize();
+void randInitialize();
+void testMultiInt();
+void multiIntPrintWithName(const char *, MultiInt);
+int main(int, const char **);
 
-int main() {
-    initialize();
-    
-    Number a = numberRandom(4);
-    Number b = numberRandom(3);
-
-    printf("a = %s\n", numberToString(a).value);
-    printf("b = %s\n", numberToString(b).value);
-    printf("a + b = %s\n", numberToString(numberAdd(a, b)).value);
-    printf("a - b = %s\n", numberToString(numberSub(a, b)).value);
-    printf("a * b = %s\n", numberToString(numberMul(a, b)).value);
-    printf("a / b = %s\n", numberToString(numberDiv(a, b)).value);
-    printf("a %% b = %s\n", numberToString(numberMod(a, b)).value);
-    printf("(int)a * (int)b = %d\n", numberToInt(a) * numberToInt(b));
-    printf("(int)a / (int)b = %d\n", numberToInt(a) / numberToInt(b));
-    printf("(int)a %% (int)b = %d\n", numberToInt(a) % numberToInt(b));
-
-    for (int i = 0; i < 100; i++) numberDiv(numberRandom(64), numberRandom(32));
+int main(int argc, const char **argv) {
+    randInitialize();
+    testMultiInt();
 
     return 0;
 }
 
-void initialize() {
+void randInitialize() {
     srand((unsigned int)time(NULL));
     rand();
+}
+
+void testMultiInt() {
+    int intA = randomRangeInt(-10000, 10000);
+    int intB = randomRangeInt(-1000, 1000);
+    MultiInt multiIntA = intToMultiInt(intA);
+    MultiInt multiIntB = intToMultiInt(intB);
+
+    printf("=== int ===\n");
+    printf("a = %d\n", intA);
+    printf("b = %d\n", intB);
+    printf("a + b = %d\n", intA + intB);
+    printf("a - b = %d\n", intA - intB);
+    printf("a * b = %d\n", intA * intB);
+    printf("a / b = %d\n", intA / intB);
+    printf("a %% b = %d\n", intA % intB);
+
+    putchar('\n');
+
+    printf("=== MultiInt ===\n");
+    multiIntPrintWithName("a", multiIntA);
+    multiIntPrintWithName("b", multiIntB);
+    multiIntPrintWithName("a + b", multiIntAdd(multiIntA, multiIntB));
+    multiIntPrintWithName("a - b", multiIntSub(multiIntA, multiIntB));
+    multiIntPrintWithName("a * b", multiIntMul(multiIntA, multiIntB));
+    multiIntPrintWithName("a / b", multiIntDiv(multiIntA, multiIntB));
+    multiIntPrintWithName("a % b", multiIntMod(multiIntA, multiIntB));
+
+    putchar('\n');
+
+    printf("連続計算を開始します。\n");
+    for (int i = 0; i < 10000; i++) {
+        if (!((i + 1) % 1000)) printf("%d回目の計算中……\n", i + 1);
+        intA = randomRangeInt(-10000, 10000);
+        intB = randomRangeInt(-10000, 10000);
+        multiIntA = intToMultiInt(intA);
+        multiIntB = intToMultiInt(intB);
+        if (intA + intB != multiIntToInt(multiIntAdd(multiIntA, multiIntB))) {
+            printf("加算に失敗しました。\n");
+            multiIntPrintWithName("a", multiIntA);
+            multiIntPrintWithName("b", multiIntB);
+            multiIntPrintWithName("a + b", multiIntAdd(multiIntA, multiIntB));
+            return;
+        }
+        if (intA - intB != multiIntToInt(multiIntSub(multiIntA, multiIntB))) {
+            printf("減算に失敗しました。\n");
+            multiIntPrintWithName("a", multiIntA);
+            multiIntPrintWithName("b", multiIntB);
+            multiIntPrintWithName("a - b", multiIntSub(multiIntA, multiIntB));
+            return;
+        }
+        if (intA * intB != multiIntToInt(multiIntMul(multiIntA, multiIntB))) {
+            printf("乗算に失敗しました。\n");
+            multiIntPrintWithName("a", multiIntA);
+            multiIntPrintWithName("b", multiIntB);
+            multiIntPrintWithName("a * b", multiIntMul(multiIntA, multiIntB));
+            return;
+        }
+        if (multiIntIsZero(multiIntB)) continue;
+        if (intA / intB != multiIntToInt(multiIntDiv(multiIntA, multiIntB))) {
+            printf("除算に失敗しました。\n");
+            multiIntPrintWithName("a", multiIntA);
+            multiIntPrintWithName("b", multiIntB);
+            multiIntPrintWithName("a / b", multiIntDiv(multiIntA, multiIntB));
+            return;
+        }
+        if (intA % intB != multiIntToInt(multiIntMod(multiIntA, multiIntB))) {
+            printf("剰余算に失敗しました。\n");
+            multiIntPrintWithName("a", multiIntA);
+            multiIntPrintWithName("b", multiIntB);
+            multiIntPrintWithName("a % b", multiIntMod(multiIntA, multiIntB));
+            return;
+        }
+    }
+    printf("正常に終了しました。\n");
+}
+
+void multiIntPrintWithName(const char *name, MultiInt multiInt) {
+    printf("%s = ", name);
+    multiIntPrint(multiInt);
+    putchar('\n');
 }

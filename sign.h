@@ -1,38 +1,49 @@
 #ifndef _H_SIGN_
 #define _H_SIGN_
 
+#include <stdbool.h>
 #include <string.h>
+#include "common.h"
 
 typedef struct _Sign {
     char *_value;
 } Sign;
 
-Sign signPositive();
+void signPrint(Sign);
 Sign signNegative();
-Sign signReversed(Sign sign);
-char signEquals(Sign a, Sign b);
-char *signToCharP(Sign sign);
+Sign signPositive();
+Sign signRandom();
+Sign signReverse(Sign);
+bool signEquals(Sign, Sign);
+static Sign newSign(char *);
 
-Sign signPositive() {
-    Sign result = { ._value = "+ " };
-    return result;
+void signPrint(Sign this) {
+    printf(this._value);
 }
 
 Sign signNegative() {
-    Sign result = { ._value = "- " };
+    return newSign("- ");
+}
+
+Sign signPositive() {
+    return newSign("+ ");
+}
+
+Sign signRandom() {
+    return probabilityIsHit(0.5f) ? signNegative() : signPositive();
+}
+
+Sign signReverse(Sign this) {
+    return signEquals(this, signNegative()) ? signPositive() : signNegative();
+}
+
+bool signEquals(Sign this, Sign other) {
+    return !strcmp(this._value, other._value);
+}
+
+static Sign newSign(char *value) {
+    Sign result = { ._value = value };
     return result;
-}
-
-Sign signReversed(Sign sign) {
-    return signEquals(sign, signNegative()) ? signPositive() : signNegative();
-}
-
-char signEquals(Sign a, Sign b) {
-    return !strcmp(a._value, b._value);
-}
-
-char *signToCharP(Sign sign) {
-    return sign._value;
 }
 
 #endif
