@@ -18,7 +18,7 @@ bool signEquals(Sign, Sign);
 static Sign newSign(char *);
 
 void signPrint(Sign this) {
-    printf(this._value);
+    printf("%s", this._value);
 }
 
 Sign signNegative() {

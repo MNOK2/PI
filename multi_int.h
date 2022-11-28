@@ -16,6 +16,7 @@ typedef struct _MultiInt {
 } MultiInt;
 
 void multiIntPrint(MultiInt);
+void multiIntPrintWithName(const char *, MultiInt);
 bool multiIntIsZero(MultiInt);
 int multiIntCompareTo(MultiInt, MultiInt);
 int multiIntToInt(MultiInt);
@@ -50,6 +51,12 @@ void multiIntPrint(MultiInt this) {
         digitPrint(this._digits[i]);
         if (i > 0) putchar(' ');
     }
+}
+
+void multiIntPrintWithName(const char *name, MultiInt multiInt) {
+    printf("%s = ", name);
+    multiIntPrint(multiInt);
+    putchar('\n');
 }
 
 bool multiIntIsZero(MultiInt this) {
@@ -156,6 +163,7 @@ MultiInt multiIntMul(MultiInt this, MultiInt other) {
 }
 
 MultiInt multiIntDiv(MultiInt this, MultiInt other) {
+    if (multiIntIsZero(other)) throwException("multiIntDivでゼロ除算が発生しました。");
     if (!signEquals(this._sign, other._sign)) return multiIntSignReverse(multiIntDiv(multiIntAbs(this), multiIntAbs(other)));
     if (signEquals(this._sign, signNegative())) return multiIntDiv(multiIntAbs(this), multiIntAbs(other));
     MultiInt rem = multiIntZero();
@@ -175,6 +183,7 @@ MultiInt multiIntDiv(MultiInt this, MultiInt other) {
 }
 
 MultiInt multiIntMod(MultiInt this, MultiInt other) {
+    if (multiIntIsZero(other)) throwException("multiIntModでゼロ除算が発生しました。");
     if (signEquals(this._sign, signNegative())) return multiIntSignReverse(multiIntMod(multiIntAbs(this), multiIntAbs(other)));
     if (signEquals(other._sign, signNegative())) return multiIntMod(this, multiIntAbs(other));
     MultiInt result = multiIntZero();
@@ -188,6 +197,7 @@ MultiInt multiIntMod(MultiInt this, MultiInt other) {
 }
 
 static Digit multiIntDivDigit(MultiInt this, MultiInt other) {
+    if (multiIntIsZero(other)) throwException("multiIntDivDigitでゼロ除算が発生しました。");
     if (!signEquals(this._sign, other._sign)) throwException("multiIntDivDigitの結果が負になります。");
     if (signEquals(this._sign, signNegative())) return multiIntDivDigit(multiIntAbs(this), multiIntAbs(other));
     MultiInt rem = this;
@@ -220,6 +230,7 @@ static MultiInt multiIntMulDigit(MultiInt this, Digit other) {
 }
 
 static MultiInt multiIntModDigit(MultiInt this, MultiInt other) {
+    if (multiIntIsZero(other)) throwException("multiIntModDigitでゼロ除算が発生しました。");
     if (signEquals(this._sign, signNegative())) return multiIntSignReverse(multiIntModDigit(multiIntAbs(this), multiIntAbs(other)));
     if (signEquals(other._sign, signNegative())) return multiIntModDigit(this, multiIntAbs(other));
     MultiInt result = this;

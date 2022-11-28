@@ -5,7 +5,6 @@
 
 void randInitialize();
 void testMultiInt();
-void multiIntPrintWithName(const char *, MultiInt);
 int main(int, const char **);
 
 int main(int argc, const char **argv) {
@@ -93,10 +92,4 @@ void testMultiInt() {
         }
     }
     printf("正常に終了しました。\n");
-}
-
-void multiIntPrintWithName(const char *name, MultiInt multiInt) {
-    printf("%s = ", name);
-    multiIntPrint(multiInt);
-    putchar('\n');
 }
