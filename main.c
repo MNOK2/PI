@@ -20,10 +20,15 @@ void randInitialize() {
 }
 
 void testMultiInt() {
-    int intA = randomRangeInt(-10000, 10000);
-    int intB = randomRangeInt(-1000, 1000);
+    int intA = randomRangeInt(-100, 100);
+    int intB = randomRangeInt(-10, 10);
     MultiInt multiIntA = intToMultiInt(intA);
     MultiInt multiIntB = intToMultiInt(intB);
+
+    if (!intB) {
+        printf("除数が0であるため計算を中止します。");
+        return;
+    }
 
     printf("=== int ===\n");
     printf("a = %d\n", intA);
@@ -44,6 +49,8 @@ void testMultiInt() {
     multiIntPrintWithName("a * b", multiIntMul(multiIntA, multiIntB));
     multiIntPrintWithName("a / b", multiIntDiv(multiIntA, multiIntB));
     multiIntPrintWithName("a % b", multiIntMod(multiIntA, multiIntB));
+    multiIntPrintWithName("pow(a, |b|)", multiIntPow(multiIntA, multiIntAbs(multiIntB)));
+    multiIntPrintWithName("fact(|a|)", multiIntFact(multiIntAbs(multiIntA)));
 
     putchar('\n');
 

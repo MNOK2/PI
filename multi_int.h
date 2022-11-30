@@ -18,9 +18,11 @@ typedef struct _MultiInt {
 void multiIntPrint(MultiInt);
 void multiIntPrintWithName(const char *, MultiInt);
 bool multiIntIsZero(MultiInt);
+bool multiIntIsOne(MultiInt);
 int multiIntCompareTo(MultiInt, MultiInt);
 int multiIntToInt(MultiInt);
 MultiInt multiIntZero();
+MultiInt multiIntOne();
 MultiInt intToMultiInt(int);
 MultiInt multiIntRandom(int);
 MultiInt multiIntAbs(MultiInt);
@@ -32,6 +34,8 @@ MultiInt multiIntSub(MultiInt, MultiInt);
 MultiInt multiIntMul(MultiInt, MultiInt);
 MultiInt multiIntDiv(MultiInt, MultiInt);
 MultiInt multiIntMod(MultiInt, MultiInt);
+MultiInt multiIntPow(MultiInt, MultiInt);
+MultiInt multiIntFibo(MultiInt);
 static Digit multiIntDivDigit(MultiInt, MultiInt);
 static MultiInt newMultiInt(Sign, const Digit *);
 static MultiInt multiIntInsert(MultiInt, Digit);
@@ -64,6 +68,12 @@ bool multiIntIsZero(MultiInt this) {
     return true;
 }
 
+bool multiIntIsOne(MultiInt this) {
+    if (signEquals(this._sign, signNegative()) || !digitIsOne(this._digits[0])) return false;
+    for (int i = 1; i < MULTI_INT_DIGITS_SIZE; i++) if (!digitIsZero(this._digits[i])) return false;
+    return true;
+}
+
 int multiIntCompareTo(MultiInt this, MultiInt other) {
     if (multiIntIsZero(this) && multiIntIsZero(other)) return 0;
     if (signEquals(this._sign, signNegative()) && signEquals(other._sign, signPositive())) return -1;
@@ -86,6 +96,13 @@ int multiIntToInt(MultiInt this) {
 MultiInt multiIntZero() {
     Digit digits[MULTI_INT_DIGITS_SIZE];
     for (int i = 0; i < MULTI_INT_DIGITS_SIZE; i++) digits[i] = digitZero();
+    return newMultiInt(signPositive(), digits);
+}
+
+MultiInt multiIntOne() {
+    Digit digits[MULTI_INT_DIGITS_SIZE];
+    digits[0] = digitOne();
+    for (int i = 1; i < MULTI_INT_DIGITS_SIZE; i++) digits[i] = digitZero();
     return newMultiInt(signPositive(), digits);
 }
 
@@ -194,6 +211,19 @@ MultiInt multiIntMod(MultiInt this, MultiInt other) {
         result = multiIntModDigit(multiIntInsert(result, this._digits[i]), other);
     }
     return result;
+}
+
+MultiInt multiIntPow(MultiInt this, MultiInt other) {
+    int compareResult = multiIntCompareTo(other, multiIntZero());
+    if (compareResult < 0) throwException("multiIntPowの指数が負です。");
+    if (!compareResult) return multiIntOne();
+    return multiIntMul(this, multiIntPow(this, multiIntSub(other, multiIntOne())));
+}
+
+MultiInt multiIntFact(MultiInt this) {
+    if (multiIntCompareTo(this, multiIntZero()) < 0) throwException("multiIntFactの引数が負です。");
+    if (multiIntIsZero(this)) return multiIntOne();
+    return multiIntMul(this, multiIntFact(multiIntSub(this, multiIntOne())));
 }
 
 static Digit multiIntDivDigit(MultiInt this, MultiInt other) {

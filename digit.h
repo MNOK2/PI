@@ -13,10 +13,12 @@ typedef struct _Digit {
 
 void digitPrint(Digit);
 bool digitIsZero(Digit);
+bool digitIsOne(Digit);
 int digitWithWeight(Digit, int);
 int digitCompareTo(Digit, Digit);
 Digit newDigit(int value);
 Digit digitZero();
+Digit digitOne();
 Digit digitRandom();
 Digit digitAdd(Digit, Digit, int *);
 Digit digitSub(Digit, Digit, int *);
@@ -28,6 +30,10 @@ void digitPrint(Digit this) {
 
 bool digitIsZero(Digit this) {
     return !this._value;
+}
+
+bool digitIsOne(Digit this) {
+    return this._value == 1;
 }
 
 int digitWithWeight(Digit this, int weight) {
@@ -48,6 +54,10 @@ Digit newDigit(int value) {
 
 Digit digitZero() {
     return newDigit(0);
+}
+
+Digit digitOne() {
+    return newDigit(1);
 }
 
 Digit digitRandom() {
