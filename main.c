@@ -4,12 +4,13 @@
 #include "multi_int.h"
 
 void randInitialize();
-void testMultiInt();
+void testMultiIntCalculationOnce();
+void testMultiIntCalculationMany();
 int main(int, const char **);
 
 int main(int argc, const char **argv) {
     randInitialize();
-    testMultiInt();
+    testMultiIntCalculationOnce();
 
     return 0;
 }
@@ -19,14 +20,14 @@ void randInitialize() {
     rand();
 }
 
-void testMultiInt() {
+void testMultiIntCalculationOnce() {
     int intA = randomRangeInt(-100, 100);
-    int intB = randomRangeInt(-10, 10);
+    int intB = randomRangeInt(-100, 100);
     MultiInt multiIntA = intToMultiInt(intA);
     MultiInt multiIntB = intToMultiInt(intB);
 
     if (!intB) {
-        printf("除数が0であるため計算を中止します。");
+        printf("除数が0であるため計算を中止します。\n");
         return;
     }
 
@@ -49,10 +50,17 @@ void testMultiInt() {
     multiIntPrintWithName("a * b", multiIntMul(multiIntA, multiIntB));
     multiIntPrintWithName("a / b", multiIntDiv(multiIntA, multiIntB));
     multiIntPrintWithName("a % b", multiIntMod(multiIntA, multiIntB));
-    multiIntPrintWithName("pow(a, |b|)", multiIntPow(multiIntA, multiIntAbs(multiIntB)));
+    multiIntPrintWithName("sqrt(|a|)", multiIntSqrt(multiIntAbs(multiIntA)));
     multiIntPrintWithName("fact(|a|)", multiIntFact(multiIntAbs(multiIntA)));
+    multiIntPrintWithName("pow(a, |b|)", multiIntPow(multiIntA, multiIntAbs(multiIntB)));
+    multiIntPrintWithName("gcd(a, b)", multiIntGCD(multiIntA, multiIntB));
+    multiIntPrintWithName("lcm(a, b)", multiIntLCM(multiIntA, multiIntB));
+    printf("a is prime = %s\n", multiIntIsPrime(multiIntA) ? "TRUE" : "FALSE");
+}
 
-    putchar('\n');
+void testMultiIntCalculationMany() {
+    int intA, intB;
+    MultiInt multiIntA, multiIntB;
 
     printf("連続計算を開始します。\n");
     for (int i = 0; i < 10000; i++) {

@@ -19,6 +19,7 @@ void multiIntPrint(MultiInt);
 void multiIntPrintWithName(const char *, MultiInt);
 bool multiIntIsZero(MultiInt);
 bool multiIntIsOne(MultiInt);
+bool multiIntIsPrime(MultiInt);
 int multiIntCompareTo(MultiInt, MultiInt);
 int multiIntToInt(MultiInt);
 MultiInt multiIntZero();
@@ -27,6 +28,7 @@ MultiInt intToMultiInt(int);
 MultiInt multiIntRandom(int);
 MultiInt multiIntAbs(MultiInt);
 MultiInt multiIntSignReverse(MultiInt);
+MultiInt multiIntSqrt(MultiInt);
 MultiInt multiIntDigitShiftLeft(MultiInt, int);
 MultiInt multiIntDigitShiftRight(MultiInt, int);
 MultiInt multiIntAdd(MultiInt, MultiInt);
@@ -35,7 +37,6 @@ MultiInt multiIntMul(MultiInt, MultiInt);
 MultiInt multiIntDiv(MultiInt, MultiInt);
 MultiInt multiIntMod(MultiInt, MultiInt);
 MultiInt multiIntPow(MultiInt, MultiInt);
-MultiInt multiIntFibo(MultiInt);
 static Digit multiIntDivDigit(MultiInt, MultiInt);
 static MultiInt newMultiInt(Sign, const Digit *);
 static MultiInt multiIntInsert(MultiInt, Digit);
@@ -57,9 +58,9 @@ void multiIntPrint(MultiInt this) {
     }
 }
 
-void multiIntPrintWithName(const char *name, MultiInt multiInt) {
+void multiIntPrintWithName(const char *name, MultiInt this) {
     printf("%s = ", name);
-    multiIntPrint(multiInt);
+    multiIntPrint(this);
     putchar('\n');
 }
 
@@ -71,6 +72,14 @@ bool multiIntIsZero(MultiInt this) {
 bool multiIntIsOne(MultiInt this) {
     if (signEquals(this._sign, signNegative()) || !digitIsOne(this._digits[0])) return false;
     for (int i = 1; i < MULTI_INT_DIGITS_SIZE; i++) if (!digitIsZero(this._digits[i])) return false;
+    return true;
+}
+
+bool multiIntIsPrime(MultiInt this) {
+    if (multiIntIsZero(multiIntMod(this, intToMultiInt(2)))) return false;
+    MultiInt two = intToMultiInt(2);
+    MultiInt sqrt = multiIntSqrt(this);
+    for (MultiInt i = intToMultiInt(3); multiIntCompareTo(i, sqrt) <= 0; i = multiIntAdd(i, two)) if (multiIntIsZero(multiIntMod(this, i))) return false;
     return true;
 }
 
@@ -130,6 +139,18 @@ MultiInt multiIntAbs(MultiInt this) {
 
 MultiInt multiIntSignReverse(MultiInt this) {
     return newMultiInt(signReverse(this._sign), this._digits);
+}
+
+MultiInt multiIntSqrt(MultiInt this) {
+    const int N = 10;
+    const MultiInt TWO = intToMultiInt(2);
+    MultiInt x = multiIntOne();
+    for (int i = 0; i < N; i++) {
+        MultiInt y = multiIntSub(multiIntMul(x, x), this);
+        MultiInt yd = multiIntMul(TWO, x);
+        x = multiIntSub(x, multiIntDiv(y, yd));
+    }
+    return multiIntCompareTo(multiIntMul(x, x), this) > 0 ? multiIntSub(x, multiIntOne()) : x;
 }
 
 MultiInt multiIntDigitShiftLeft(MultiInt this, int count) {
@@ -224,6 +245,17 @@ MultiInt multiIntFact(MultiInt this) {
     if (multiIntCompareTo(this, multiIntZero()) < 0) throwException("multiIntFactの引数が負です。");
     if (multiIntIsZero(this)) return multiIntOne();
     return multiIntMul(this, multiIntFact(multiIntSub(this, multiIntOne())));
+}
+
+MultiInt multiIntGCD(MultiInt this, MultiInt other) {
+    if (multiIntIsZero(other)) return multiIntAbs(this);
+    return multiIntGCD(other, multiIntMod(this, other));
+}
+
+MultiInt multiIntLCM(MultiInt this, MultiInt other) {
+    MultiInt gcd = multiIntGCD(this, other);
+    if (multiIntIsZero(gcd)) return multiIntZero();
+    return multiIntAbs(multiIntDiv(multiIntMul(this, other), gcd));
 }
 
 static Digit multiIntDivDigit(MultiInt this, MultiInt other) {
