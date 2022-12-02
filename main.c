@@ -55,7 +55,7 @@ void testMultiIntCalculationOnce() {
     multiIntPrintWithName("pow(a, |b|)", multiIntPow(multiIntA, multiIntAbs(multiIntB)));
     multiIntPrintWithName("gcd(a, b)", multiIntGCD(multiIntA, multiIntB));
     multiIntPrintWithName("lcm(a, b)", multiIntLCM(multiIntA, multiIntB));
-    printf("a is prime = %s\n", multiIntIsPrime(multiIntA) ? "TRUE" : "FALSE");
+    printf("|a| is prime = %s\n", multiIntIsPrime(multiIntAbs(multiIntA)) ? "TRUE" : "FALSE");
 }
 
 void testMultiIntCalculationMany() {

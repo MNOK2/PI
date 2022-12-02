@@ -76,8 +76,10 @@ bool multiIntIsOne(MultiInt this) {
 }
 
 bool multiIntIsPrime(MultiInt this) {
-    if (multiIntIsZero(multiIntMod(this, intToMultiInt(2)))) return false;
+    if (multiIntCompareTo(this, multiIntOne()) <= 0) return false;
     MultiInt two = intToMultiInt(2);
+    if (!multiIntCompareTo(this, two)) return true;
+    if (multiIntIsZero(multiIntMod(this, intToMultiInt(2)))) return false;
     MultiInt sqrt = multiIntSqrt(this);
     for (MultiInt i = intToMultiInt(3); multiIntCompareTo(i, sqrt) <= 0; i = multiIntAdd(i, two)) if (multiIntIsZero(multiIntMod(this, i))) return false;
     return true;
