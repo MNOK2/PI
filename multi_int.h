@@ -35,6 +35,7 @@ MultiInt multiIntAdd(MultiInt, MultiInt);
 MultiInt multiIntSub(MultiInt, MultiInt);
 MultiInt multiIntMul(MultiInt, MultiInt);
 MultiInt multiIntDiv(MultiInt, MultiInt);
+MultiInt multiIntDivRound(MultiInt, MultiInt);
 MultiInt multiIntMod(MultiInt, MultiInt);
 MultiInt multiIntPow(MultiInt, MultiInt);
 static Digit multiIntDivDigit(MultiInt, MultiInt);
@@ -144,15 +145,16 @@ MultiInt multiIntSignReverse(MultiInt this) {
 }
 
 MultiInt multiIntSqrt(MultiInt this) {
-    const int N = 10;
     const MultiInt TWO = intToMultiInt(2);
     MultiInt x = multiIntOne();
-    for (int i = 0; i < N; i++) {
+    while (true) {
         MultiInt y = multiIntSub(multiIntMul(x, x), this);
         MultiInt yd = multiIntMul(TWO, x);
-        x = multiIntSub(x, multiIntDiv(y, yd));
+        MultiInt next = multiIntSub(x, multiIntDivRound(y, yd));
+        if (!multiIntCompareTo(x, next)) break;
+        x = next;
     }
-    return multiIntCompareTo(multiIntMul(x, x), this) > 0 ? multiIntSub(x, multiIntOne()) : x;
+    return x;
 }
 
 MultiInt multiIntDigitShiftLeft(MultiInt this, int count) {
@@ -220,6 +222,27 @@ MultiInt multiIntDiv(MultiInt this, MultiInt other) {
         rem = multiIntModDigit(rem, other);
     }
     return newMultiInt(signPositive(), digits);
+}
+
+MultiInt multiIntDivRound(MultiInt this, MultiInt other) {
+    if (multiIntIsZero(other)) throwException("multiIntDivRoundでゼロ除算が発生しました。");
+    if (!signEquals(this._sign, other._sign)) return multiIntSignReverse(multiIntDiv(multiIntAbs(this), multiIntAbs(other)));
+    if (signEquals(this._sign, signNegative())) return multiIntDiv(multiIntAbs(this), multiIntAbs(other));
+    MultiInt rem = multiIntZero();
+    Digit digits[MULTI_INT_DIGITS_SIZE];
+    bool zeroOngoing = true;
+    for (int i = MULTI_INT_DIGITS_SIZE - 1; i >= 0; i--) {
+        if (zeroOngoing && !digitIsZero(this._digits[i])) zeroOngoing = false;
+        if (zeroOngoing) {
+            digits[i] = digitZero();
+            continue;
+        }
+        rem = multiIntInsert(rem, this._digits[i]);
+        digits[i] = multiIntDivDigit(rem, other);
+        rem = multiIntModDigit(rem, other);
+    }
+    if (digitCompareTo(multiIntDivDigit(multiIntInsert(rem, digitZero()), other), newDigit(5)) < 0) return newMultiInt(signPositive(), digits);
+    return multiIntAdd(newMultiInt(signPositive(), digits), multiIntOne());
 }
 
 MultiInt multiIntMod(MultiInt this, MultiInt other) {

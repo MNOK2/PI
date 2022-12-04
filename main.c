@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "multi_int.h"
 
 void randInitialize();
@@ -39,6 +40,7 @@ void testMultiIntCalculationOnce() {
     printf("a * b = %d\n", intA * intB);
     printf("a / b = %d\n", intA / intB);
     printf("a %% b = %d\n", intA % intB);
+    printf("sqrt(|a|) = %f\n", sqrt((double)intAbs(intA)));
 
     putchar('\n');
 
