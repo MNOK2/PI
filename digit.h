@@ -8,7 +8,7 @@
 #define DIGIT_CARDINAL_NUMBER 10
 
 typedef struct _Digit {
-    char _value;
+    unsigned char _value;
 } Digit;
 
 void digitPrint(Digit);

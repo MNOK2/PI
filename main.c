@@ -32,7 +32,7 @@ void testMultiIntCalculationOnce() {
         return;
     }
 
-    printf("=== int ===\n");
+    printf("=== 組み込み ===\n");
     printf("a = %d\n", intA);
     printf("b = %d\n", intB);
     printf("a + b = %d\n", intA + intB);
@@ -41,6 +41,9 @@ void testMultiIntCalculationOnce() {
     printf("a / b = %d\n", intA / intB);
     printf("a %% b = %d\n", intA % intB);
     printf("sqrt(|a|) = %f\n", sqrt((double)intAbs(intA)));
+    printf("sin(1) = %.16f\n", sin(1.0));
+    printf("cos(1) = %.16f\n", sin(1.0));
+    printf("pow(a, |b| = %.16e\n", pow(intA, doubleAbs(intB)));
 
     putchar('\n');
 
@@ -54,6 +57,8 @@ void testMultiIntCalculationOnce() {
     multiIntPrintWithName("a % b", multiIntMod(multiIntA, multiIntB));
     multiIntPrintWithName("sqrt(|a|)", multiIntSqrt(multiIntAbs(multiIntA)));
     multiIntPrintWithName("fact(|a|)", multiIntFact(multiIntAbs(multiIntA)));
+    multiIntPrintWithName("sin(1)", multiIntSin(multiIntOne()));
+    multiIntPrintWithName("cos(1)", multiIntCos(multiIntOne()));
     multiIntPrintWithName("pow(a, |b|)", multiIntPow(multiIntA, multiIntAbs(multiIntB)));
     multiIntPrintWithName("gcd(a, b)", multiIntGCD(multiIntA, multiIntB));
     multiIntPrintWithName("lcm(a, b)", multiIntLCM(multiIntA, multiIntB));

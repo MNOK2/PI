@@ -8,7 +8,8 @@
 #include "digit.h"
 #include "common.h"
 
-#define MULTI_INT_DIGITS_SIZE 1024
+#define MULTI_INT_DIGITS_SIZE (1 << 10)
+#define MULTI_INT_MATH_MAGNIFICATION 99
 
 typedef struct _MultiInt {
     Sign _sign;
@@ -29,6 +30,8 @@ MultiInt multiIntRandom(int);
 MultiInt multiIntAbs(MultiInt);
 MultiInt multiIntSignReverse(MultiInt);
 MultiInt multiIntSqrt(MultiInt);
+MultiInt multiIntSin(MultiInt);
+MultiInt multiIntCos(MultiInt);
 MultiInt multiIntDigitShiftLeft(MultiInt, int);
 MultiInt multiIntDigitShiftRight(MultiInt, int);
 MultiInt multiIntAdd(MultiInt, MultiInt);
@@ -122,8 +125,8 @@ MultiInt intToMultiInt(int value) {
     Digit digits[MULTI_INT_DIGITS_SIZE];
     int temp = value;
     for (int i = 0; i < MULTI_INT_DIGITS_SIZE; i++) {
-        digits[i] = newDigit(intAbs(temp % 10));
-        temp /= 10;
+        digits[i] = newDigit(intAbs(temp % DIGIT_CARDINAL_NUMBER));
+        temp /= DIGIT_CARDINAL_NUMBER;
     }
     return newMultiInt(value < 0 ? signNegative() : signPositive(), digits);
 }
@@ -146,7 +149,7 @@ MultiInt multiIntSignReverse(MultiInt this) {
 
 MultiInt multiIntSqrt(MultiInt this) {
     const MultiInt TWO = intToMultiInt(2);
-    MultiInt x = multiIntOne();
+    MultiInt x = this;
     while (true) {
         MultiInt y = multiIntSub(multiIntMul(x, x), this);
         MultiInt yd = multiIntMul(TWO, x);
@@ -155,6 +158,36 @@ MultiInt multiIntSqrt(MultiInt this) {
         x = next;
     }
     return x;
+}
+
+MultiInt multiIntSin(MultiInt this) {
+    const MultiInt ONE = multiIntOne();
+    const MultiInt TWO = intToMultiInt(2);
+    MultiInt delta, result = multiIntZero();
+    MultiInt a = multiIntDigitShiftLeft(ONE, MULTI_INT_MATH_MAGNIFICATION);
+    MultiInt b = ONE, c = this;
+    for (MultiInt i = multiIntZero(); !multiIntIsZero(delta = multiIntDivRound(multiIntMul(a, c), b)); i = multiIntAdd(i, ONE)) {
+        result = multiIntAdd(result, delta);
+        a = multiIntSignReverse(a);
+        b = multiIntMul(b, multiIntMul(TWO, multiIntMul(multiIntAdd(i, ONE), multiIntAdd(multiIntMul(TWO, multiIntAdd(i, ONE)), ONE))));
+        c = multiIntMul(c, multiIntPow(this, TWO));
+    }
+    return result;
+}
+
+MultiInt multiIntCos(MultiInt this) {
+    const MultiInt ONE = multiIntOne();
+    const MultiInt TWO = intToMultiInt(2);
+    MultiInt delta, result = multiIntZero();
+    MultiInt a = multiIntDigitShiftLeft(ONE, MULTI_INT_MATH_MAGNIFICATION);
+    MultiInt b = ONE, c = ONE;
+    for (MultiInt i = multiIntZero(); !multiIntIsZero(delta = multiIntDivRound(multiIntMul(a, c), b)); i = multiIntAdd(i, ONE)) {
+        result = multiIntAdd(result, delta);
+        a = multiIntSignReverse(a);
+        b = multiIntMul(b, multiIntMul(TWO, multiIntMul(multiIntAdd(i, ONE), multiIntSub(multiIntMul(TWO, multiIntAdd(i, ONE)), ONE))));
+        c = multiIntMul(c, multiIntPow(this, TWO));
+    }
+    return result;
 }
 
 MultiInt multiIntDigitShiftLeft(MultiInt this, int count) {
@@ -171,6 +204,14 @@ MultiInt multiIntDigitShiftRight(MultiInt this, int count) {
     for (int i = 0; i < MULTI_INT_DIGITS_SIZE - count; i++) digits[i] = this._digits[i + count];
     for (int i = MULTI_INT_DIGITS_SIZE - count; i < MULTI_INT_DIGITS_SIZE; i++) digits[i] = digitZero();
     return newMultiInt(this._sign, digits);
+}
+
+MultiInt multiIntDiv10Round(MultiInt this, int count) {
+    if (count < 0) throwException("multiIntDiv10Round: countが負です。");
+    if (!count) return this;
+    if (count > MULTI_INT_DIGITS_SIZE) return multiIntZero();
+    if (digitCompareTo(this._digits[count - 1], newDigit(DIGIT_CARDINAL_NUMBER / 2)) < 0) return multiIntDigitShiftRight(this, count);
+    return newMultiInt(this._sign, multiIntAdd(multiIntAbs(multiIntDigitShiftRight(this, count)), multiIntOne())._digits);
 }
 
 MultiInt multiIntAdd(MultiInt this, MultiInt other) {
@@ -226,8 +267,8 @@ MultiInt multiIntDiv(MultiInt this, MultiInt other) {
 
 MultiInt multiIntDivRound(MultiInt this, MultiInt other) {
     if (multiIntIsZero(other)) throwException("multiIntDivRoundでゼロ除算が発生しました。");
-    if (!signEquals(this._sign, other._sign)) return multiIntSignReverse(multiIntDiv(multiIntAbs(this), multiIntAbs(other)));
-    if (signEquals(this._sign, signNegative())) return multiIntDiv(multiIntAbs(this), multiIntAbs(other));
+    if (!signEquals(this._sign, other._sign)) return multiIntSignReverse(multiIntDivRound(multiIntAbs(this), multiIntAbs(other)));
+    if (signEquals(this._sign, signNegative())) return multiIntDivRound(multiIntAbs(this), multiIntAbs(other));
     MultiInt rem = multiIntZero();
     Digit digits[MULTI_INT_DIGITS_SIZE];
     bool zeroOngoing = true;
@@ -241,7 +282,7 @@ MultiInt multiIntDivRound(MultiInt this, MultiInt other) {
         digits[i] = multiIntDivDigit(rem, other);
         rem = multiIntModDigit(rem, other);
     }
-    if (digitCompareTo(multiIntDivDigit(multiIntInsert(rem, digitZero()), other), newDigit(5)) < 0) return newMultiInt(signPositive(), digits);
+    if (digitCompareTo(multiIntDivDigit(multiIntInsert(rem, digitZero()), other), newDigit(DIGIT_CARDINAL_NUMBER / 2)) < 0) return newMultiInt(signPositive(), digits);
     return multiIntAdd(newMultiInt(signPositive(), digits), multiIntOne());
 }
 

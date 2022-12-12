@@ -2,7 +2,6 @@
 #define _H_SIGN_
 
 #include <stdbool.h>
-#include <string.h>
 #include "common.h"
 
 typedef struct _Sign {
@@ -38,7 +37,7 @@ Sign signReverse(Sign this) {
 }
 
 bool signEquals(Sign this, Sign other) {
-    return !strcmp(this._value, other._value);
+    return this._value == other._value;
 }
 
 static Sign newSign(char *value) {

@@ -7,12 +7,14 @@
 #include <stdbool.h>
 
 void throwException(const char *, ...);
-bool probabilityIsHit(float);
+bool probabilityIsHit(double);
 int intAbs(int);
 int randomRangeInt(int, int);
 int euclideanDivInt(int, int);
 int euclideanModInt(int, int);
-float randomRatio();
+double randomRatio();
+double doubleAbs(double);
+double randomRangeDouble(double, double);
 
 void throwException(const char *format, ...) {
     va_list ap;
@@ -23,7 +25,7 @@ void throwException(const char *format, ...) {
     exit(1);
 }
 
-bool probabilityIsHit(float probability) {
+bool probabilityIsHit(double probability) {
     return randomRatio() < probability;
 }
 
@@ -45,8 +47,17 @@ int euclideanModInt(int this, int other) {
     return rem < 0 ? rem + other : rem;
 }
 
-float randomRatio() {
-    return rand() / (RAND_MAX + 1.0f);
+double randomRatio() {
+    return rand() / (RAND_MAX + 1.0);
+}
+
+double doubleAbs(double value) {
+    return value < 0.0 ? -value : value;
+}
+
+double randomRangeDouble(double min, double max) {
+    if (min >= max) throwException("randomRangeDoubleの範囲が[%.2e, %.2e)をとりました。", min, max);
+    return min + (max - min) * randomRatio();
 }
 
 #endif
